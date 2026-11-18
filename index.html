@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador de Valorização CUB-SC | Gessele</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ibarra+Real+Nova:wght@400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --vinho:#4e293a;
+  --vinho-2:#5a3245;
+  --vinho-3:#3f2130;
+  --dourado:#c8a97b;
+  --dourado-soft:rgba(200,169,123,.35);
+  --dourado-line:rgba(200,169,123,.22);
+  --branco:#ffffff;
+  --branco-2:rgba(255,255,255,.72);
+  --branco-3:rgba(255,255,255,.5);
+  --erro:#f0a3a3;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--vinho);color:var(--branco);font-family:"Jost",system-ui,sans-serif;font-weight:400;-webkit-font-smoothing:antialiased}
+body{min-height:100vh}
+.wrap{max-width:1080px;margin:0 auto;padding:56px 28px 80px}
+header{text-align:center;margin-bottom:48px}
+.marca{display:flex;align-items:center;justify-content:center;gap:12px;color:var(--dourado);font-weight:600;letter-spacing:.32em;font-size:12px;font-weight:500}
+.marca svg{width:16px;height:16px}
+h1{font-family:"Ibarra Real Nova",serif;font-weight:400;font-size:40px;line-height:1.15;margin:22px 0 10px;letter-spacing:.01em}
+.sub{color:var(--branco-2);font-size:15px;font-weight:300;margin:0}
+.filete{width:64px;height:1px;background:var(--dourado);margin:26px auto 0}
+
+section{margin-top:44px}
+h2{font-family:"Ibarra Real Nova",serif;font-weight:400;font-size:26px;color:var(--dourado);margin:0 0 6px;text-align:center}
+.h2sub{text-align:center;color:var(--branco-3);font-size:13px;margin:0 0 26px;letter-spacing:.04em}
+
+.card{border:1px solid rgba(200,169,123,.28);border-radius:10px;padding:30px 30px 26px}
+.card,.resumo,.tblwrap,details.cub{background:#3f1f2d;color:#ffffff;box-shadow:0 2px 14px rgba(0,0,0,.18)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 26px}
+.field label{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dourado);margin-bottom:8px;font-weight:500}
+.field label .opt{color:var(--branco-3);letter-spacing:.06em;text-transform:none;font-weight:300}
+.field input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--dourado-soft);color:var(--branco);font:inherit;font-size:17px;padding:6px 0 8px;outline:none;border-radius:0;color-scheme:dark}
+.field input:focus{border-bottom-color:var(--dourado)}
+.field input::placeholder{color:rgba(255,255,255,.28)}
+.field.invalid input{border-bottom-color:var(--erro)}
+.hint{font-size:12px;color:var(--branco-3);margin-top:6px;min-height:14px}
+
+.aviso{margin-top:22px;font-size:13px;color:var(--branco-2);text-align:center}
+.acoes{display:flex;justify-content:center;margin-top:24px}
+.aviso.erro{color:var(--erro)}
+
+.resumo{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid rgba(200,169,123,.28);border-radius:10px;overflow:hidden}
+.kpi{padding:22px 16px;text-align:center;border-right:1px solid var(--dourado-line)}
+.kpi:last-child{border-right:none}
+.kpi .k{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dourado);margin-bottom:10px}
+.kpi .v{font-family:"Ibarra Real Nova",serif;font-size:22px;white-space:nowrap}
+.kpi .d{font-size:12px;color:var(--branco-3);margin-top:6px}
+.kpi.destaque{background:rgba(200,169,123,.12)}
+.kpi.destaque .k,.kpi.destaque .d{color:#c8a97b}
+.kpi.destaque .v{color:var(--dourado);font-size:25px}
+.ident{text-align:center;color:var(--branco-2);font-size:14px;margin:0 0 18px;letter-spacing:.04em}
+.ident b{color:var(--dourado);font-weight:500}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dourado);font-weight:500;text-align:right;padding:10px 14px;border-bottom:1px solid var(--dourado-soft)}
+th:first-child,td:first-child{text-align:left}
+td{padding:8px 14px;text-align:right;border-bottom:1px solid rgba(255,255,255,.06);font-variant-numeric:tabular-nums}
+.ano-head td{padding-top:22px;border-bottom:1px solid var(--dourado-line);font-family:"Ibarra Real Nova",serif;font-size:18px;color:var(--dourado);text-align:left}
+.ano-head td span{font-family:"Jost",sans-serif;font-size:12px;color:var(--branco-3);margin-left:10px;letter-spacing:.04em}
+.fixo{color:var(--branco-2)}
+.sub-row td{background:rgba(200,169,123,.14);font-weight:500}
+.sub-row td.lbl{color:var(--dourado);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.calc{color:var(--branco)}
+.tot-row td{padding:12px 14px;border-bottom:1px solid var(--dourado-line)}
+.tot-row.final td{font-family:"Ibarra Real Nova",serif;font-size:19px;color:var(--dourado);border-bottom:none}
+.tot-row td.lbl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--branco-2)}
+.tot-row.final td.lbl{font-family:"Jost",sans-serif;color:var(--dourado)}
+.tblwrap{overflow-x:auto;border:1px solid rgba(200,169,123,.28);border-radius:10px;padding:6px 10px 10px}
+
+.vazio{text-align:center;color:var(--branco-3);padding:40px 0;font-size:14px;border:1px dashed var(--dourado);border-radius:4px}
+
+details.cub{border:1px solid rgba(200,169,123,.28);border-radius:10px}
+details.cub summary{cursor:pointer;list-style:none;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--dourado)}
+details.cub summary::-webkit-details-marker{display:none}
+details.cub summary .meta{color:var(--branco-3);letter-spacing:.04em;text-transform:none;font-size:13px}
+.cub-body{padding:6px 24px 26px}
+.addform{display:grid;grid-template-columns:1.1fr 1fr 1fr auto;gap:18px;align-items:end;margin:8px 0 22px;padding-bottom:22px;border-bottom:1px solid var(--dourado-line)}
+.btn{background:transparent;border:1px solid var(--dourado);color:var(--dourado);font:inherit;font-size:12px;letter-spacing:.16em;text-transform:uppercase;padding:11px 20px;border-radius:2px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:rgba(200,169,123,.12)}
+.btn.cheio{background:var(--dourado);color:var(--vinho);font-weight:600}
+.btn.cheio:hover{background:#d6ba90}
+.btn:disabled{opacity:.4;cursor:default}
+.link{background:none;border:none;color:var(--branco-3);font:inherit;font-size:12px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
+.link:hover{color:var(--erro)}
+.link.confirma{color:var(--erro)}
+.cub-list{max-height:420px;overflow-y:auto}
+.cub-list td{padding:7px 14px}
+.cub-list tr.novo td{color:var(--dourado)}
+.barra-salvar{display:flex;gap:14px;align-items:center;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.status{font-size:13px;color:var(--branco-2);margin-right:auto}
+.status.erro{color:var(--erro)}
+.readonly-note{font-size:13px;color:var(--branco-3);margin:4px 0 18px}
+
+#acoes-pdf{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:22px;flex-wrap:wrap}
+#pdf-status{font-size:13px;color:var(--branco-2)}
+@media print{
+  @page{size:A4;margin:12mm}
+  html,body{background:#4e293a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .wrap{padding:0;max-width:none}
+  #sec-form,#sec-cub,#acoes-pdf,footer{display:none !important}
+  section{margin-top:24px}
+  .kpi .v{font-size:17px}
+  .kpi.destaque .v{font-size:19px}
+  tr{break-inside:avoid}
+}
+footer{margin-top:60px;text-align:center;color:var(--branco-3);font-size:12px;letter-spacing:.06em}
+footer .filete{margin:0 auto 18px}
+
+@media (max-width:860px){
+  .grid{grid-template-columns:1fr 1fr}
+  .resumo{grid-template-columns:1fr 1fr}
+  .kpi{border-bottom:1px solid var(--dourado-line)}
+  .kpi.destaque{grid-column:span 2}
+  .addform{grid-template-columns:1fr 1fr}
+}
+@media (max-width:560px){
+  .wrap{padding:36px 18px 60px}
+  h1{font-size:30px}
+  .grid{grid-template-columns:1fr}
+  .card{padding:22px 18px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="marca">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#c8a97b" d="M12 0 C12.9 7.2 16.8 11.1 24 12 C16.8 12.9 12.9 16.8 12 24 C11.1 16.8 7.2 12.9 0 12 C7.2 11.1 11.1 7.2 12 0Z"/></svg>
+      GESSELE EMPREENDIMENTOS
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#c8a97b" d="M12 0 C12.9 7.2 16.8 11.1 24 12 C16.8 12.9 12.9 16.8 12 24 C11.1 16.8 7.2 12.9 0 12 C7.2 11.1 11.1 7.2 12 0Z"/></svg>
+    </div>
+    <h1>Simulador de Valorização da Unidade</h1>
+    <p class="sub">Correção pelo CUB-SC a cada 12 meses, do mês da compra até o mês atual</p>
+    <div class="filete"></div>
+  </header>
+
+  <section style="margin-top:0" id="sec-form">
+    <div class="card">
+      <div class="grid">
+        <div class="field" id="f-data">
+          <label for="in-data">Data da compra</label>
+          <input type="text" id="in-data" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" autocomplete="off">
+          <div class="hint"></div>
+        </div>
+        <div class="field" id="f-pago">
+          <label for="in-pago">Valor pago</label>
+          <input type="text" id="in-pago" inputmode="numeric" placeholder="R$ 0,00">
+          <div class="hint"></div>
+        </div>
+        <div class="field" id="f-tabela">
+          <label for="in-tabela">Valor atual de tabela</label>
+          <input type="text" id="in-tabela" inputmode="numeric" placeholder="R$ 0,00">
+          <div class="hint"></div>
+        </div>
+        <div class="field" id="f-comissao">
+          <label for="in-comissao">Comissão (%)</label>
+          <input type="text" id="in-comissao" inputmode="decimal" value="6">
+          <div class="hint"></div>
+        </div>
+        <div class="field">
+          <label for="in-unidade">Unidade <span class="opt">(opcional)</span></label>
+          <input type="text" id="in-unidade" placeholder="Ex.: 3601">
+          <div class="hint"></div>
+        </div>
+        <div class="field">
+          <label for="in-cliente">Cliente <span class="opt">(opcional)</span></label>
+          <input type="text" id="in-cliente" placeholder="Nome do cliente">
+          <div class="hint"></div>
+        </div>
+      </div>
+      <div class="aviso" id="aviso"></div>
+      <div class="acoes"><button class="btn" id="btn-limpar" type="button">Limpar</button></div>
+    </div>
+  </section>
+
+  <section id="sec-resultado">
+    <h2>Resultado</h2>
+    <p class="h2sub" id="periodo-txt">Preencha os campos obrigatórios para simular</p>
+    <div id="resultado"><div class="vazio">Informe data da compra, valor pago, valor atual de tabela e comissão.</div></div>
+    <div id="acoes-pdf" hidden><button class="btn cheio" id="btn-pdf" type="button">Salvar PDF</button><span id="pdf-status"></span></div>
+  </section>
+
+  <section id="sec-detalhe" hidden>
+    <h2>Memória de cálculo</h2>
+    <p class="h2sub">Valor corrigido do período = valor base &times; soma do CUB-SC dos meses do período</p>
+    <div class="tblwrap">
+      <table id="tbl-detalhe">
+        <thead><tr><th>Mês</th><th>CUB-SC no mês</th><th>Valor base</th><th>Correção</th><th>Valor corrigido</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="sec-cub">
+    <details class="cub" id="cub-details">
+      <summary><span>Tabela de índices CUB-SC</span><span class="meta" id="cub-meta"></span></summary>
+      <div class="cub-body">
+        <div id="cub-editor">
+          <div class="addform">
+            <div class="field">
+              <label for="cub-mes">Mês</label>
+              <input type="month" id="cub-mes">
+            </div>
+            <div class="field">
+              <label for="cub-valor">CUB-SC (R$/m²) <span class="opt">(opcional)</span></label>
+              <input type="text" id="cub-valor" inputmode="decimal" placeholder="Ex.: 3.182,95">
+            </div>
+            <div class="field">
+              <label for="cub-pct">Variação no mês (%)</label>
+              <input type="text" id="cub-pct" inputmode="decimal" placeholder="Ex.: 0,35">
+            </div>
+            <button class="btn" id="cub-add" type="button">Incluir</button>
+          </div>
+        </div>
+        <p class="readonly-note" id="cub-readonly" hidden>Somente quem edita esta página pode alterar os índices.</p>
+        <div class="cub-list">
+          <table id="tbl-cub">
+            <thead><tr><th>Mês</th><th>CUB-SC (R$/m²)</th><th>Variação no mês</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="barra-salvar">
+          <span class="status" id="cub-status"></span>
+          <button class="btn" id="cub-descartar" type="button" hidden>Descartar</button>
+          <button class="btn cheio" id="cub-salvar" type="button" hidden>Salvar índices</button>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <footer>
+    <div class="filete"></div>
+    Simulação de caráter informativo. Índices: CUB-SC (Sinduscon), variação mensal.
+  </footer>
+</div>
+
+<script type="application/json" id="cub-data">[["2022-01",2428.1,0.0052],["2022-02",2438.51,0.0043],["2022-03",2444.3,0.0024],["2022-04",2461.35,0.007],["2022-05",2470.83,0.0039],["2022-06",2544.17,0.0297],["2022-07",2572.55,0.0112],["2022-08",2603.14,0.0119],["2022-09",2623.42,0.0078],["2022-10",2632.38,0.0034],["2022-11",2633.22,0.0003],["2022-12",2643.16,0.0038],["2023-01",2651.17,0.003],["2023-02",2662.47,0.0043],["2023-03",2671.09,0.0032],["2023-04",2680.84,0.0037],["2023-05",2688.94,0.003],["2023-06",2725.79,0.0137],["2023-07",2747.9,0.0081],["2023-08",2750.52,0.001],["2023-09",2752.32,0.0007],["2023-10",2754.77,0.0009],["2023-11",2754.98,0.0001],["2023-12",2752.67,-0.0008],["2024-01",2752.28,-0.0001],["2024-02",2753.62,0.0005],["2024-03",2755.41,0.0007],["2024-04",2757.56,0.0008],["2024-05",2758.46,0.0003],["2024-06",2774.29,0.0057],["2024-07",2793.27,0.0068],["2024-08",2811.86,0.0067],["2024-09",2841.51,0.0105],["2024-10",2846.12,0.0016],["2024-11",2863.73,0.0062],["2024-12",2868.56,0.0017],["2025-01",2887.91,0.0067],["2025-02",2901.09,0.0046],["2025-03",2907.85,0.0023],["2025-04",2916.12,0.0028],["2025-05",2923.52,0.0025],["2025-06",2934.53,0.0038],["2025-07",2965.54,0.0106],["2025-08",2978.02,0.0042],["2025-09",2993.04,0.005],["2025-10",2999.38,0.0021],["2025-11",3003.02,0.0012],["2025-12",3008.84,0.0019],["2026-01",3012.64,0.0013],["2026-02",3019.26,0.0022],["2026-03",3028.45,0.003],["2026-04",3037.72,0.0031],["2026-05",3064.1,0.0087],["2026-06",3096.25,0.0105],["2026-07",3121.62,0.0082],["2026-08",3151.24,0.0095],["2026-09",3158.88,0.0024],["2026-10",3171.96,0.0041],["2026-11",3182.95,0.0035]]</script>
+
+<script data-keep>
+(function(){
+  // Documento original, capturado antes de qualquer renderização, para republicar com novos índices
+  var PRISTINE = document.documentElement.outerHTML;
+
+  var MESES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+  var LS_KEY = "gessele_cub_sc_v1";
+  var savedCub = JSON.parse(document.getElementById("cub-data").textContent);
+  var cub = savedCub.slice();
+  var artifactNs = null, canPublish = null, localMode = false, downloadsNs = null, lastR = null;
+
+  // Fallback: se a página não puder publicar, usa o navegador
+  try{
+    var ls = localStorage.getItem(LS_KEY);
+    if(ls){ var p = JSON.parse(ls); if(Array.isArray(p) && p.length){ localMode = true; savedCub = p; cub = p.slice(); } }
+  }catch(e){}
+
+  var $ = function(id){ return document.getElementById(id); };
+  var brl = new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"});
+  function fmtR(v){ return brl.format(v); }
+  function fmtPct(f){ return (f*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:3})+"%"; }
+  function fmtNum(v){ return v==null||v===""?"":v.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function ymLabel(ym){ var a=ym.split("-"); return MESES[+a[1]-1]+"/"+a[0].slice(2); }
+  function ymAdd(ym,n){ var a=ym.split("-"); var t=(+a[0])*12+(+a[1]-1)+n; return Math.floor(t/12)+"-"+String(t%12+1).padStart(2,"0"); }
+  function sortCub(){ cub.sort(function(a,b){ return a[0]<b[0]?-1:a[0]>b[0]?1:0; }); }
+  function cubMap(){ var m={}; cub.forEach(function(r){ m[r[0]]=r; }); return m; }
+  function nowYM(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"); }
+
+  // Máscara de moeda
+  function parseMoney(s){ var d=(s||"").replace(/\D/g,""); return d?parseInt(d,10)/100:null; }
+  function maskMoney(el){
+    el.addEventListener("input",function(){ var v=parseMoney(el.value); el.value=v==null?"":fmtR(v); run(); });
+  }
+  function parseDec(s){
+    if(s==null) return null; s=String(s).trim().replace("%","");
+    if(!s) return null;
+    if(s.indexOf(",")>=0) s=s.replace(/\./g,"").replace(",",".");
+    var n=Number(s); return isFinite(n)?n:null;
+  }
+
+  maskMoney($("in-pago")); maskMoney($("in-tabela"));
+  $("in-data").addEventListener("input",function(){
+    var d=this.value.replace(/\D/g,"").slice(0,8), o=d.slice(0,2);
+    if(d.length>2) o+="/"+d.slice(2,4);
+    if(d.length>4) o+="/"+d.slice(4);
+    this.value=o;
+  });
+  function parseData(s){
+    var m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s||""); if(!m) return null;
+    var d=+m[1], mo=+m[2], y=+m[3], dt=new Date(y,mo-1,d);
+    if(y<1900||dt.getFullYear()!==y||dt.getMonth()!==mo-1||dt.getDate()!==d) return null;
+    return y+"-"+m[2]+"-"+m[1];
+  }
+  $("btn-limpar").addEventListener("click",function(){
+    ["in-data","in-pago","in-tabela","in-unidade","in-cliente"].forEach(function(id){ $(id).value=""; });
+    $("in-comissao").value="6";
+    ["f-data","f-pago","f-tabela","f-comissao"].forEach(function(id){ setInvalid(id,""); });
+    run(); $("in-data").focus();
+  });
+  ["in-data","in-comissao","in-unidade","in-cliente"].forEach(function(id){ $(id).addEventListener("input",run); });
+
+  function setInvalid(id,msg){ var f=$(id); f.classList.toggle("invalid",!!msg); f.querySelector(".hint").textContent=msg||""; }
+
+  function run(){
+    var dataTxt=$("in-data").value, dataS=parseData(dataTxt), pago=parseMoney($("in-pago").value), tabela=parseMoney($("in-tabela").value);
+    var comS=$("in-comissao").value, com=parseDec(comS);
+    var unidade=$("in-unidade").value.trim(), cliente=$("in-cliente").value.trim();
+    var aviso=$("aviso"); aviso.className="aviso"; aviso.textContent="";
+
+    setInvalid("f-data", dataTxt.length===10 && !dataS ? "Data inválida" : "");
+    setInvalid("f-comissao", comS.trim()!=="" && (com==null||com<0) ? "Percentual inválido" : "");
+    var ok = dataS && pago && tabela && com!=null && com>=0;
+    if(!ok){ renderVazio(); return; }
+
+    sortCub();
+    var map=cubMap(), inicio=dataS.slice(0,7), atual=nowYM();
+    var ultimo = cub.length ? cub[cub.length-1][0] : null;
+    if(inicio>atual){ setInvalid("f-data","Data no futuro"); renderVazio(); return; }
+    setInvalid("f-data","");
+    if(!cub.length || inicio<cub[0][0]){ aviso.className="aviso erro"; aviso.textContent="Não há índice CUB-SC cadastrado para "+ymLabel(inicio)+". Inclua os índices na tabela abaixo."; renderVazio(); return; }
+
+    var fim = atual;
+    if(!map[atual]){
+      fim = ultimo<atual ? ultimo : atual;
+      aviso.textContent="O CUB-SC de "+ymLabel(atual)+" ainda não está cadastrado. A simulação foi calculada até "+ymLabel(fim)+".";
+    }
+    if(fim<inicio){ aviso.className="aviso erro"; aviso.textContent="Ainda não há índice CUB-SC cadastrado a partir de "+ymLabel(inicio)+"."; renderVazio(); return; }
+
+    // Lista de meses do período
+    var meses=[], faltando=[], ym=inicio;
+    while(ym<=fim){ if(!map[ym]) faltando.push(ymLabel(ym)); meses.push(ym); ym=ymAdd(ym,1); }
+    if(faltando.length){ aviso.className="aviso erro"; aviso.textContent="Faltam índices CUB-SC para: "+faltando.join(", ")+". Inclua na tabela abaixo."; renderVazio(); return; }
+
+    // Correção de 12 em 12 meses
+    var periodos=[], base=pago;
+    for(var i=0;i<meses.length;i+=12){
+      var bloco=meses.slice(i,i+12);
+      var soma=bloco.reduce(function(s,m){ return s+map[m][2]; },0);
+      soma=Math.round(soma*1e8)/1e8;
+      var correcao=base*soma, total=base+correcao;
+      periodos.push({n:periodos.length+1,meses:bloco,base:base,soma:soma,correcao:correcao,total:total});
+      base=total;
+    }
+    var corrigido=base, comissao=corrigido*com/100, final=corrigido+comissao;
+    render({dataTxt:dataTxt,pago:pago,tabela:tabela,com:com,unidade:unidade,cliente:cliente,inicio:inicio,fim:fim,periodos:periodos,map:map,corrigido:corrigido,comissao:comissao,final:final,nMeses:meses.length});
+  }
+
+  function renderVazio(){
+    $("periodo-txt").textContent="Preencha os campos obrigatórios para simular";
+    $("resultado").innerHTML='<div class="vazio">Informe data da compra, valor pago, valor atual de tabela e comissão.</div>';
+    $("sec-detalhe").hidden=true;
+    lastR=null; $("acoes-pdf").hidden=true; $("pdf-status").textContent="";
+  }
+
+  function esc(s){ return s.replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+
+  function render(r){
+    var valorizacao=r.corrigido-r.pago, pctVal=valorizacao/r.pago;
+    $("periodo-txt").textContent=ymLabel(r.inicio)+" a "+ymLabel(r.fim)+"  |  "+r.nMeses+" meses  |  "+r.periodos.length+(r.periodos.length>1?" períodos de correção":" período de correção");
+    var ident="";
+    if(r.unidade||r.cliente){
+      ident='<p class="ident">'+(r.unidade?'Unidade <b>'+esc(r.unidade)+'</b>':'')+(r.unidade&&r.cliente?'  |  ':'')+(r.cliente?'Cliente <b>'+esc(r.cliente)+'</b>':'')+'</p>';
+    }
+    $("resultado").innerHTML=ident+
+      '<div class="resumo">'+
+        kpi("Valor pago",fmtR(r.pago),"Compra em "+ymLabel(r.inicio))+
+        kpi("Valor corrigido",fmtR(r.corrigido),"+"+fmtR(valorizacao)+" ("+fmtPct(pctVal)+")")+
+        kpi("Comissão "+fmtNumPct(r.com),fmtR(r.comissao),"Sobre o valor corrigido")+
+        kpi("Valor final",fmtR(r.final),"Corrigido + comissão","destaque")+
+        kpi("Valor atual de tabela",fmtR(r.tabela),"Valor informado")+
+      '</div>';
+
+    var h="";
+    r.periodos.forEach(function(p){
+      var ini=p.meses[0], fi=p.meses[p.meses.length-1];
+      h+='<tr class="ano-head"><td colspan="5">Ano '+p.n+'<span>'+ymLabel(ini)+' a '+ymLabel(fi)+' | '+p.meses.length+(p.meses.length>1?' meses':' mês')+'</span></td></tr>';
+      p.meses.forEach(function(m,idx){
+        h+='<tr><td class="fixo">'+ymLabel(m)+'</td><td class="fixo">'+fmtPct(r.map[m][2])+'</td><td>'+(idx===0?fmtR(p.base):'')+'</td><td></td><td></td></tr>';
+      });
+      h+='<tr class="sub-row"><td class="lbl">Soma do período</td><td class="calc">'+fmtPct(p.soma)+'</td><td class="calc">'+fmtR(p.base)+'</td><td class="calc">'+fmtR(p.correcao)+'</td><td class="calc">'+fmtR(p.total)+'</td></tr>';
+    });
+    h+='<tr class="tot-row"><td class="lbl" colspan="4">Valor corrigido</td><td>'+fmtR(r.corrigido)+'</td></tr>';
+    h+='<tr class="tot-row"><td class="lbl" colspan="4">Comissão '+fmtNumPct(r.com)+'</td><td>'+fmtR(r.comissao)+'</td></tr>';
+    h+='<tr class="tot-row final"><td class="lbl" colspan="4">Valor final</td><td>'+fmtR(r.final)+'</td></tr>';
+    h+='<tr class="tot-row"><td class="lbl" colspan="4">Valor atual de tabela</td><td>'+fmtR(r.tabela)+'</td></tr>';
+    $("tbl-detalhe").querySelector("tbody").innerHTML=h;
+    $("sec-detalhe").hidden=false;
+    lastR=r; $("acoes-pdf").hidden=false; $("pdf-status").textContent="";
+  }
+  function fmtNumPct(n){ return n.toLocaleString("pt-BR",{maximumFractionDigits:3})+"%"; }
+  function kpi(k,v,d,cls){ return '<div class="kpi '+(cls||"")+'"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="d">'+d+'</div></div>'; }
+
+  // ---------- Tabela CUB ----------
+  var savedKeys = {};
+  function markSaved(){ savedKeys={}; savedCub.forEach(function(r){ savedKeys[r[0]]=r[1]+"|"+r[2]; }); }
+  markSaved();
+  var pendingDel=null;
+
+  function dirty(){ return JSON.stringify(cub)!==JSON.stringify(savedCub.slice().sort(function(a,b){return a[0]<b[0]?-1:1;})); }
+
+  function renderCub(){
+    sortCub();
+    var editable = canPublish!==false;
+    var rows=cub.slice().reverse().map(function(r){
+      var novo = savedKeys[r[0]]!==r[1]+"|"+r[2];
+      var del = editable ? '<button class="link'+(pendingDel===r[0]?' confirma':'')+'" data-del="'+r[0]+'">'+(pendingDel===r[0]?'Confirmar exclusão':'Excluir')+'</button>' : '';
+      return '<tr class="'+(novo?'novo':'')+'"><td>'+ymLabel(r[0])+'</td><td>'+(r[1]==null?'':fmtNum(r[1]))+'</td><td>'+fmtPct(r[2])+'</td><td>'+del+'</td></tr>';
+    }).join("");
+    $("tbl-cub").querySelector("tbody").innerHTML=rows;
+    var last=cub.length?ymLabel(cub[cub.length-1][0]):"-";
+    $("cub-meta").textContent=cub.length+" meses cadastrados | último: "+last;
+    var d=dirty();
+    $("cub-salvar").hidden=!d; $("cub-descartar").hidden=!d;
+    if(d){ setStatus("Alterações não salvas."); }
+  }
+  function setStatus(t,err){ var s=$("cub-status"); s.textContent=t||""; s.className="status"+(err?" erro":""); }
+
+  $("tbl-cub").addEventListener("click",function(e){
+    var b=e.target.closest("[data-del]"); if(!b) return;
+    var k=b.getAttribute("data-del");
+    if(pendingDel!==k){ pendingDel=k; renderCub(); return; }
+    cub=cub.filter(function(r){ return r[0]!==k; }); pendingDel=null; renderCub(); run();
+  });
+
+  $("cub-add").addEventListener("click",function(){
+    var ym=$("cub-mes").value, v=parseDec($("cub-valor").value), p=parseDec($("cub-pct").value);
+    if(!ym){ setStatus("Informe o mês.",true); return; }
+    if(p==null){ setStatus("Informe a variação do mês em %.",true); return; }
+    var frac=Math.round(p*1e6)/1e8;
+    var existe=cub.some(function(r){ return r[0]===ym; });
+    cub=cub.filter(function(r){ return r[0]!==ym; });
+    cub.push([ym, v==null?null:v, frac]);
+    $("cub-valor").value=""; $("cub-pct").value="";
+    $("cub-mes").value=ymAdd(ym,1);
+    pendingDel=null; renderCub(); run();
+    setStatus((existe?"Índice de ":"Incluído ")+ymLabel(ym)+(existe?" atualizado.":".")+" Clique em Salvar índices para gravar.");
+  });
+
+  $("cub-descartar").addEventListener("click",function(){
+    cub=savedCub.slice(); pendingDel=null; renderCub(); run(); setStatus("Alterações descartadas.");
+  });
+
+  $("cub-salvar").addEventListener("click",function(){
+    sortCub();
+    var btn=$("cub-salvar"); btn.disabled=true; setStatus("Salvando...");
+    if(artifactNs && canPublish!==false){
+      var json=JSON.stringify(cub);
+      var html="<!DOCTYPE html>\n"+PRISTINE.replace(/(<script type="application\/json" id="cub-data">)[\s\S]*?(<\/script>)/, function(_,a,b){ return a+json+b; });
+      // remove scripts injetados pela plataforma (mantém apenas os da página)
+      html=html.replace(/<script(?![^>]*data-keep)(?![^>]*id="cub-data")[^>]*>[\s\S]*?<\/script>/g,"");
+      artifactNs.publish(html).then(function(){
+        try{ localStorage.removeItem(LS_KEY); }catch(e){}
+        savedCub=cub.slice(); markSaved(); btn.disabled=false; renderCub(); setStatus("Índices salvos para todos que usam esta página.");
+      }).catch(function(err){
+        btn.disabled=false;
+        var c=(err&&(err.code||err.message))||"";
+        if(/not_writer|not_granted/.test(c)){ canPublish=false; saveLocal(); }
+        else if(/conflict/.test(c)){ setStatus("A página foi atualizada por outra pessoa. Inclua o índice novamente.",true); }
+        else { setStatus("Não foi possível salvar: "+c,true); }
+      });
+    } else { saveLocal(); btn.disabled=false; }
+  });
+
+  function saveLocal(){
+    try{
+      localStorage.setItem(LS_KEY,JSON.stringify(cub));
+      savedCub=cub.slice(); markSaved(); renderCub();
+      setStatus("Índices salvos somente neste navegador.");
+    }catch(e){ setStatus("Não foi possível salvar neste navegador.",true); }
+  }
+
+  // ---------- PDF ----------
+  function loadScript(src){ return new Promise(function(ok,no){ var s=document.createElement("script"); s.src=src; s.onload=ok; s.onerror=no; document.head.appendChild(s); }); }
+  var libs=null;
+  function loadLibs(){
+    if(!libs) libs=loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js")
+      .then(function(){ return loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"); });
+    return libs;
+  }
+  function pdfStatus(t){ $("pdf-status").textContent=t||""; }
+
+  $("btn-pdf").addEventListener("click",function(){
+    if(!lastR) return;
+    var r=lastR, btn=this;
+    btn.disabled=true; pdfStatus("Gerando PDF...");
+    loadLibs().then(function(){
+      var blob=gerarPDF(r);
+      var nome="Simulacao CUB-SC"+(r.unidade?" - Unidade "+r.unidade:"")+(r.cliente?" - "+r.cliente:"")+".pdf";
+      nome=nome.replace(/[\\/:*?"<>|]/g,"");
+      if(downloadsNs) return downloadsNs.save({filename:nome,data:blob});
+      // fora do Claude (ex.: Vercel): download direto pelo navegador
+      var url=URL.createObjectURL(blob), a=document.createElement("a");
+      a.href=url; a.download=nome; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); },4000);
+    }).then(function(){ pdfStatus("PDF salvo."); })
+    .catch(function(err){
+      var c=err&&err.code;
+      if(c==="declined") pdfStatus("");
+      else if(c==="rate_limited") pdfStatus("Aguarde um instante e tente de novo.");
+      else pdfStatus("Não foi possível gerar o PDF. Use Ctrl+P e escolha Salvar como PDF.");
+    }).then(function(){ btn.disabled=false; });
+  });
+
+  function gerarPDF(r){
+    var jsPDF=window.jspdf.jsPDF, doc=new jsPDF({unit:"mm",format:"a4"});
+    var W=210, H=297, V=[78,41,58], D=[200,169,123], B=[63,31,45], WH=[255,255,255], M=[214,198,205], S=[82,50,56];
+    var t=function(s){ return String(s).replace(/ | /g," "); };
+    function fundo(){ doc.setFillColor(V[0],V[1],V[2]); doc.rect(0,0,W,H,"F"); }
+    function cor(c){ doc.setTextColor(c[0],c[1],c[2]); }
+    fundo();
+    var y=20;
+    cor(D); doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setCharSpace(1.6);
+    doc.text("GESSELE EMPREENDIMENTOS",W/2,y,{align:"center"}); doc.setCharSpace(0);
+    cor(WH); doc.setFont("times","normal"); doc.setFontSize(22);
+    doc.text("Simulador de Valorização da Unidade",W/2,y+12,{align:"center"});
+    cor(M); doc.setFont("helvetica","normal"); doc.setFontSize(9);
+    doc.text("Correção pelo CUB-SC a cada 12 meses, do mês da compra até o mês atual",W/2,y+19,{align:"center"});
+    doc.setDrawColor(D[0],D[1],D[2]); doc.setLineWidth(0.3); doc.line(W/2-10,y+25,W/2+10,y+25);
+    y=56;
+    var ident=[]; if(r.unidade) ident.push("Unidade "+r.unidade); if(r.cliente) ident.push("Cliente "+r.cliente);
+    if(ident.length){ cor(WH); doc.setFontSize(11); doc.text(t(ident.join("   |   ")),W/2,y,{align:"center"}); y+=6; }
+    var hoje=new Date(), hj=String(hoje.getDate()).padStart(2,"0")+"/"+String(hoje.getMonth()+1).padStart(2,"0")+"/"+hoje.getFullYear();
+    cor(M); doc.setFontSize(8.5);
+    doc.text(t("Compra em "+r.dataTxt+"   |   Simulação em "+hj+"   |   "+ymLabel(r.inicio)+" a "+ymLabel(r.fim)+", "+r.nMeses+" meses"),W/2,y,{align:"center"});
+    y+=7;
+    // resumo
+    var bx=15, bw=180, bh=27, cw=bw/5;
+    doc.setFillColor(B[0],B[1],B[2]); doc.roundedRect(bx,y,bw,bh,2.5,2.5,"F");
+    doc.setFillColor(S[0],S[1],S[2]); doc.rect(bx+cw*3,y,cw,bh,"F");
+    doc.setDrawColor(D[0],D[1],D[2]); doc.setLineWidth(0.2); doc.roundedRect(bx,y,bw,bh,2.5,2.5,"S");
+    var val=r.corrigido-r.pago;
+    var ks=[["VALOR PAGO",fmtR(r.pago),"Compra em "+ymLabel(r.inicio)],
+            ["VALOR CORRIGIDO",fmtR(r.corrigido),"+"+fmtPct(val/r.pago)+" no período"],
+            ["COMISSÃO "+fmtNumPct(r.com),fmtR(r.comissao),"Sobre o valor corrigido"],
+            ["VALOR FINAL",fmtR(r.final),"Corrigido + comissão"],
+            ["VALOR DE TABELA",fmtR(r.tabela),"Valor informado"]];
+    ks.forEach(function(k,i){
+      var cx=bx+cw*i+cw/2;
+      if(i>0){ doc.setDrawColor(110,78,92); doc.line(bx+cw*i,y+4,bx+cw*i,y+bh-4); }
+      cor(D); doc.setFont("helvetica","bold"); doc.setFontSize(6.5); doc.text(t(k[0]),cx,y+8,{align:"center"});
+      cor(i===3?D:WH); doc.setFont("times",i===3?"bold":"normal"); doc.setFontSize(i===3?12:11); doc.text(t(k[1]),cx,y+16,{align:"center"});
+      cor(M); doc.setFont("helvetica","normal"); doc.setFontSize(6.5); doc.text(t(k[2]),cx,y+22,{align:"center"});
+    });
+    y+=bh+13;
+    cor(D); doc.setFont("times","normal"); doc.setFontSize(15); doc.text("Memória de cálculo",W/2,y,{align:"center"});
+    cor(M); doc.setFont("helvetica","normal"); doc.setFontSize(7.5);
+    doc.text("Valor corrigido do período = valor base x soma do CUB-SC dos meses do período",W/2,y+5,{align:"center"});
+    // tabela
+    var body=[], estilos=[];
+    r.periodos.forEach(function(p){
+      var ini=p.meses[0], fi=p.meses[p.meses.length-1];
+      body.push([{content:t("Ano "+p.n+"     "+ymLabel(ini)+" a "+ymLabel(fi)+" | "+p.meses.length+(p.meses.length>1?" meses":" mês")),colSpan:5,styles:{textColor:D,font:"times",fontSize:11,cellPadding:{top:4,bottom:1.5,left:2,right:2}}}]);
+      p.meses.forEach(function(m,idx){ body.push([ymLabel(m),fmtPct(r.map[m][2]),idx===0?fmtR(p.base):"","",""].map(t)); });
+      var sub={fillColor:S,fontStyle:"bold"};
+      body.push([{content:"SOMA DO PERÍODO",styles:Object.assign({textColor:D,fontSize:7},sub)},{content:fmtPct(p.soma),styles:sub},{content:t(fmtR(p.base)),styles:sub},{content:t(fmtR(p.correcao)),styles:sub},{content:t(fmtR(p.total)),styles:sub}]);
+    });
+    var tot=function(l,v,fin){ return [{content:l,colSpan:4,styles:{textColor:fin?D:M,fontSize:fin?8:7,fontStyle:"bold",cellPadding:{top:3,bottom:3,left:2,right:2}}},{content:t(v),styles:{textColor:fin?D:WH,font:fin?"times":"helvetica",fontStyle:fin?"bold":"normal",fontSize:fin?12:9,cellPadding:{top:3,bottom:3,left:2,right:2}}}]; };
+    body.push(tot("VALOR CORRIGIDO",fmtR(r.corrigido)));
+    body.push(tot("COMISSÃO "+t(fmtNumPct(r.com)),fmtR(r.comissao)));
+    body.push(tot("VALOR FINAL",fmtR(r.final),true));
+    body.push(tot("VALOR ATUAL DE TABELA",fmtR(r.tabela)));
+    doc.autoTable({
+      startY:y+9, margin:{left:15,right:15,top:16,bottom:18}, theme:"plain",
+      head:[["MÊS","CUB-SC NO MÊS","VALOR BASE","CORREÇÃO","VALOR CORRIGIDO"]],
+      body:body,
+      styles:{font:"helvetica",fontSize:8.5,textColor:WH,cellPadding:{top:1.4,bottom:1.4,left:2,right:2},lineColor:[100,68,82],lineWidth:{bottom:0.1}},
+      headStyles:{textColor:D,fontSize:7,fontStyle:"bold",lineColor:D,lineWidth:{bottom:0.3}},
+      columnStyles:{0:{halign:"left"},1:{halign:"right"},2:{halign:"right"},3:{halign:"right"},4:{halign:"right"}},
+      didParseCell:function(d){ if(d.section==="head" && d.column.index>0) d.cell.styles.halign="right"; if(d.cell.colSpan===4) d.cell.styles.halign="left"; },
+      willDrawPage:function(d){ if(d.pageNumber>1) fundo(); }
+    });
+    var n=doc.getNumberOfPages();
+    for(var i=1;i<=n;i++){
+      doc.setPage(i); cor(M); doc.setFont("helvetica","normal"); doc.setFontSize(7);
+      doc.text("Simulação de caráter informativo. Índices: CUB-SC (Sinduscon), variação mensal.",15,H-10);
+      doc.text(i+"/"+n,W-15,H-10,{align:"right"});
+    }
+    return doc.output("blob");
+  }
+
+  // Mês sugerido para inclusão: próximo após o último cadastrado
+  if(cub.length){ sortCub(); $("cub-mes").value=ymAdd(cub[cub.length-1][0],1); }
+
+  renderCub();
+  if(localMode) setStatus("Usando índices salvos neste navegador.");
+  run();
+
+  // Capacidade de republicar a página (índices compartilhados)
+  try{
+    if(window.claude && typeof window.claude.use==="function"){
+      window.claude.use("artifact").then(function(ns){ artifactNs=ns; }).catch(function(){});
+      window.claude.use("downloads").then(function(ns){ downloadsNs=ns; }).catch(function(){});
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
